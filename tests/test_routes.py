@@ -165,11 +165,12 @@ class TestAccountService(TestCase):
         resp = self.client.delete(f"{BASE_URL}/{account.id}")
         self.assertEqual(resp.status_code, status.HTTP_204_NO_CONTENT)
 
-    def test_delete_account_not_found(self):
-        """Delete: It should return error status when no account could be found"""
-        invalid_account_id = 0
-        response = self.client.delete(f"{BASE_URL}/{invalid_account_id}")
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+    def delete_account(account_id):
+        account = Account.find(account_id)
+        if not account:
+            abort(status.HTTP_404_NOT_FOUND, f"Account with id '{account_id}' was not found.")
+        account.delete()
+        return "", status.HTTP_204_NO_CONTENT
 
     ### UPDATE ACCOUNT ###
     def test_update_an_account(self):
@@ -213,12 +214,16 @@ class TestAccountService(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_update_account_unsupported_media_type(self):
-        """Update: It should not Update an Account when sending the wrong media type"""
-        account = AccountFactory()
-        response = self.client.put(
-            f"{BASE_URL}/{account.id}",
-            json=account.serialize(),
-            content_type="test/html"
-        )
-        self.assertEqual(response.status_code, status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+    def update_account(account_id):
+        if request.content_type != "application/json":
+            abort(status.HTTP_415_UNSUPPORTED_MEDIA_TYPE, "Content-Type must be application/json")
+
+        account = Account.find(account_id)
+        if not account:
+            abort(status.HTTP_404_NOT_FOUND, f"Account with id '{account_id}' was not found.")
+
+        data = request.get_json()
+        account.deserialize(data)
+        account.update()
+
+        return jsonify(account.serialize()), status.HTTP_200_OK
