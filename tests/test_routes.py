@@ -25,6 +25,7 @@ HTTPS_ENVIRON = {'wsgi.url_scheme': 'https'}
 ######################################################################
 #  T E S T   C A S E S
 ######################################################################
+
 class TestAccountService(TestCase):
     """Account Service Tests"""
 
@@ -148,7 +149,7 @@ class TestAccountService(TestCase):
 
     # ADD YOUR TEST CASES HERE ...
 
-    ### LIST ACCOUNTS ###
+    # LIST ACCOUNTS
     def test_get_account_list(self):
         """It should Get a list of Accounts"""
         self._create_accounts(5)
@@ -165,7 +166,7 @@ class TestAccountService(TestCase):
         # Just to be sure
         self.assertEqual(len(Account.all()), 0)
 
-    ### GET ACCOUNT ###
+    # GET ACCOUNT
     def test_get_account(self):
         """It should Read a single Account"""
         account = self._create_accounts(1)[0]
@@ -181,7 +182,7 @@ class TestAccountService(TestCase):
         resp = self.client.get(f"{BASE_URL}/0")
         self.assertEqual(resp.status_code, status.HTTP_404_NOT_FOUND)
     
-    ### DELETE ACCOUNT ###
+    # DELETE ACCOUNT
     def test_delete_account(self):
         """It should Delete an Account"""
         account = self._create_accounts(1)[0]
@@ -195,7 +196,7 @@ class TestAccountService(TestCase):
         account.delete()
         return "", status.HTTP_204_NO_CONTENT
 
-    ### UPDATE ACCOUNT ###
+    # UPDATE ACCOUNT
     def test_update_an_account(self):
         """Update: It should Update an Account"""
         account = self._create_accounts(1)[0]
